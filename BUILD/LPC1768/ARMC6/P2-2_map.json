@@ -123,8 +123,8 @@
     {
         "module": "keyboard.o",
         "size": {
-            ".text": 2964,
-            ".data": 408,
+            ".text": 3342,
+            ".data": 1208,
             ".bss": 111,
             ".text-delta": 0,
             ".data-delta": 0,
@@ -243,9 +243,9 @@
     },
     {
         "summary": {
-            "static_ram": 22714,
+            "static_ram": 23514,
             "static_ram_delta": 0,
-            "total_flash": 59408,
+            "total_flash": 60586,
             "total_flash_delta": 0
         }
     }
