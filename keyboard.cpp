@@ -3,6 +3,7 @@
 #include "dictionary.h"
 #include "doubly_linked_list.h"
 #include "globals.h"
+#include "mbed_wait_api.h"
 #include "speech.h"
 #include <cctype>
 #include <cmath>
@@ -159,7 +160,7 @@ void select_letter()
     uLCD.locate(col, row);
     uLCD.puts(guess);
 
-    speaker.period_ms(50);
+    speaker.period_ms(100);
     speaker.write(1.0);
     
     if(idx_2 == (WORD_SIZE-1)) {
@@ -244,6 +245,8 @@ void displayGameStats() {
 }
 
 void displayWinningScreen() {
+    speaker.period(0.05);
+    speaker.write(0.5);
     bool choiceMade = false;
     GameInputs inputs;
     int roundScore = (row-STARTING_ROW_NUM)+1;
@@ -259,8 +262,9 @@ void displayWinningScreen() {
     uLCD.printf("Round Score: %d", roundScore);
     //gameInPlay = false;
     uLCD.locate(3,10);
-    uLCD.printf("Play Again? Press b1 for yes\n or b2 for no.");
-    
+    uLCD.printf("Play Again?\nPress b1 for yes\n or b2 for no.");
+    wait_us(500);
+    speaker.write(0);
     // Calculate Game Statistics
     gameInfo[4]++;
     if (gameInfo[2] > roundScore) {
@@ -289,6 +293,8 @@ void displayWinningScreen() {
 }
 
 void displayLosingScreen() {
+    speaker.period(0.25);
+    speaker.write(0.5);
     // Display You Win! Screen
     bool choiceMade = false;
     GameInputs inputs;
@@ -305,7 +311,8 @@ void displayLosingScreen() {
     uLCD.puts(goal_word);
     uLCD.locate(3,10);
     uLCD.printf("Play Again?\nPress b1 for yes\nor b2 for no.");
-
+    wait_us(1500);
+    speaker.write(0);
     
     printf("Played: %d, Won: %d\n", gameInfo[3], gameInfo[4]);
 
@@ -373,12 +380,12 @@ void check_word()
 
     for (int i = 0; i < WORD_SIZE; i++) {
         if (char_in_list(guess[i], goal_word)) {  
-            if (guess[i] == goal_word[i]) { // If letter is in the word but isnt the right place and doesn't already exist correct list, add it
-                uLCD.color(0x09ff09);
+            if (guess[i] == goal_word[i]) { // Correct Letter and Correct Position
+                uLCD.color(0x09ff09);   // Green Color
                 uLCD.locate(col+i, row);
                 uLCD.putc(guess[i]);
-            } else {
-                uLCD.color(0x9e9e9e);
+            } else {                       // Correct Letter but Wrong Position
+                uLCD.color(0xffe600);   // Yellow Color
                 uLCD.locate(col+i, row);
                 uLCD.putc(guess[i]);
             }         // If the character isnt even in goal word, delete it
@@ -402,8 +409,8 @@ void check_word()
                 deleteNode(keyboard, temp); // Delete node
                 update_letter();
             }
-            // Word
-            uLCD.color(0x5c5c5c);
+            // Wrong Letter
+            uLCD.color(0x5c5c5c);      // Gray Color
             uLCD.locate(col+i, row);
             uLCD.putc(guess[i]);
         }
@@ -419,8 +426,6 @@ void check_word()
 }
 
 void update_letter() {
-    
-
     if (curr == getTail(keyboard)) {
         prevLetter = (char *) getData(getPrev(curr));
         nextLetter = (char *) getData(getHead(keyboard));
