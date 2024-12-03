@@ -238,27 +238,24 @@ void draw_lower_status()
     // Draw top border of status bar
     uLCD.line(0, 118, 127, 118, GREEN);
     uLCD.locate(14, 15);
+    uLCD.color(0xffffff);
     uLCD.printf("%d", gameInfo[5]);
     // Add other status info drawing code here
 }
  
 void drawWordleLogo() {
-    
-
-
-uLCD.BLIT(25,25,16,16, frame1);
-uLCD.BLIT(25,25,16,16, frame2);
-uLCD.BLIT(25,25,16,16, frame3);
-uLCD.BLIT(25,25,16,16, frame4);
-uLCD.BLIT(25,25,16,16, frame5);
+    uLCD.BLIT(25,25,16,16, frame1);
+    uLCD.BLIT(25,25,16,16, frame2);
+    uLCD.BLIT(25,25,16,16, frame3);
+    uLCD.BLIT(25,25,16,16, frame4);
+    uLCD.BLIT(25,25,16,16, frame5);
 }
 
 void drawWordleText() {
-
-uLCD.BLIT(5,80,16,16, w);
-uLCD.BLIT(25,80,16,16, o);
-uLCD.BLIT(45,80,16,16, r);
-uLCD.BLIT(65,80,16,16, d);
-uLCD.BLIT(85,80,16,16, l);
-uLCD.BLIT(105,80,16,16,e);
+    uLCD.BLIT(5,80,16,16, w);
+    uLCD.BLIT(25,80,16,16, o);
+    uLCD.BLIT(45,80,16,16, r);
+    uLCD.BLIT(65,80,16,16, d);
+    uLCD.BLIT(85,80,16,16, l);
+    uLCD.BLIT(105,80,16,16,e);
 }

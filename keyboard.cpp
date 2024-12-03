@@ -1,4 +1,5 @@
 #include "keyboard.h"
+#include "PeripheralNames.h"
 #include "dictionary.h"
 #include "doubly_linked_list.h"
 #include "globals.h"
@@ -154,8 +155,12 @@ void select_letter()
     */
     guess[idx_2] = *currData;
     
+    uLCD.color(0x9e9e9e);
     uLCD.locate(col, row);
     uLCD.puts(guess);
+
+    speaker.period_ms(50);
+    speaker.write(1.0);
     
     if(idx_2 == (WORD_SIZE-1)) {
         check_word();
@@ -164,6 +169,7 @@ void select_letter()
         printf("Current Guess: %s, idx = %d\n", guess, idx_2);   // DEBUGCODE
     }
     wait_us(100000);
+    speaker.write(0);
     return;
 }
 
@@ -344,6 +350,7 @@ void check_word()
     */
     printf("comparing %s and %s, ret=%d\n", goal_word, guess, strcmp(goal_word, guess));
 
+    // Manually Check if the words are equal, if not, set the found flag to false
     bool found = true;
     for(int i = 0; i < WORD_SIZE; i++) {    // Check if words are equal, set found to false if not
         if (guess[i] != goal_word[i]) {
@@ -356,7 +363,7 @@ void check_word()
     if (found) {
         displayWinningScreen();
         return;
-    } else if ((row-STARTING_ROW_NUM) == 4) {              // 5th Try
+    } else if ((row-STARTING_ROW_NUM) == 4) {        // 5th Try
         // Display Hint
         speech(hint1, hint2);
     } else if ((row - STARTING_ROW_NUM) == 5) {     // 6th Try
@@ -365,7 +372,17 @@ void check_word()
     }
 
     for (int i = 0; i < WORD_SIZE; i++) {
-        if (!char_in_list(guess[i], goal_word)) {           // If the character isnt even in goal word, delete it
+        if (char_in_list(guess[i], goal_word)) {  
+            if (guess[i] == goal_word[i]) { // If letter is in the word but isnt the right place and doesn't already exist correct list, add it
+                uLCD.color(0x09ff09);
+                uLCD.locate(col+i, row);
+                uLCD.putc(guess[i]);
+            } else {
+                uLCD.color(0x9e9e9e);
+                uLCD.locate(col+i, row);
+                uLCD.putc(guess[i]);
+            }         // If the character isnt even in goal word, delete it
+        } else {    // If character is in the word
             // Remove word from keyboard and remove it from guess
             if (!char_in_list(guess[i], incorrect)) {   // If the character was already deleted, don't try another deletion
                 incorrect[incorrect_num] = guess[i];
@@ -383,39 +400,14 @@ void check_word()
                 }
                 printf("Deleting %s from keyboard\n", (char*) getData(temp));       // DEBUGCODE
                 deleteNode(keyboard, temp); // Delete node
-                
-                
                 update_letter();
             }
-
-            guess[i] = ' ';
-
-        } else {    // If character is in the word
-            if (guess[i] != goal_word[i]) { // If letter is in the word but isnt the right place and doesn't already exist correct list, add it
-                if (!char_in_list(guess[i], correct)) {
-                    correct[correct_num] = guess[i];
-                    correct_num++;
-                }
-                guess[i] = ' ';
-            }
+            // Word
+            uLCD.color(0x5c5c5c);
+            uLCD.locate(col+i, row);
+            uLCD.putc(guess[i]);
         }
     }
-     
-
-    printf("transformed: %s\n", guess);
-
-    uLCD.locate(3, 0);
-    uLCD.puts((char *) "Correct Letters");
-
-    uLCD.color(0xf5d11d);
-    uLCD.locate(6, 2);
-    uLCD.puts(correct);
-    
-    // Change color of guess word
-    uLCD.color(0x00FF00);
-    uLCD.locate(col,row);
-    uLCD.puts(guess);
-    uLCD.color(0xFFFFFF);
 
     row++;      // Update row
     idx_2=0;    // Update "column"
